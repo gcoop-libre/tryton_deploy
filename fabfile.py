@@ -20,6 +20,7 @@ system_dependences = [
         'python-dev',
         'libxml2-dev',
         'libxslt1-dev',
+        'dtach',
         ]
 
 
@@ -57,9 +58,11 @@ def install_system_dependences():
 
 def install_python_dependences():
     """Install all python dependences using pip"""
-    put('requirements.txt', env.directory)
+    reqs = 'requirements.txt'
+    put(reqs, env.directory)
     with virtualenv():
-        sudo('pip install -r requirements.txt --log=%s/pip.log' % env.directory)
+
+        sudo('pip install -r %s --log=%s/pip.log' % (reqs, env.directory))
 
 
 def start_postgres():
@@ -73,6 +76,19 @@ def create_postgres_user():
         sudo('createuser --createdb --no-adduser -P tryton')
 
 
+def start_tryton():
+    """Start tryton server in a detached enviroment"""
+    put('launcher.py', env.directory)
+    with cd(env.directory), settings(sudo_user=env.user):
+        sudo('dtach -n /tmp/trytond python launcher.py')
+
+
+def stop_tryton():
+    """Stop tryton daemon"""
+    pidfile = "%s/pid" % env.directory
+    run("kill  $(cat %s)" % pidfile)
+
+
 def deploy():
     """Run a complete deploy on a target server"""
     install_system_dependences()
@@ -82,6 +98,7 @@ def deploy():
     install_python_dependences()
     start_postgres()
     create_postgres_user()
+    start_tryton()
 
 
 def update():
@@ -93,8 +110,9 @@ def update():
 def start():
     """Start an installed instance of trytond"""
     start_postgres()
+    start_tryton()
 
 
-def test():
-    start_postgres()
-    create_postgres_user()
+def stop():
+    """Stop Execution"""
+    stop_tryton()
