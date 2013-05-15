@@ -33,9 +33,10 @@ El script `launcher.py` se encarga de iniciar trytond dentro del virtualenv
 
 ## TODO
 
- * Creación de una base de datos
- * Instalación de los modulos necesarios
+ * Activacion de modulos necesarios
  * Esquema de desarrollo, para poder probar los modulos "en vivo"
+ * Migrar paquetes de tymbra
+ * Instalar paquetes de tymbra que no estan en pypi
 
 ## IDEAS
  * Crear un directorio "modules" que esté linkeado al directorio modules, donde ponemos nuestros modulos custom
