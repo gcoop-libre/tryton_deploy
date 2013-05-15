@@ -1,0 +1,19 @@
+trytond_account==2.8.0
+trytond_account_invoice==2.8.0
+trytond_account_invoice_history==2.8.0
+trytond_account_product==2.8.0
+trytond_company==2.8.0
+trytond_country==2.8.0
+trytond_currency==2.8.0
+trytond_party==2.8.0
+trytond_product==2.8.0
+trytond_purchase==2.8.0
+trytond_sale==2.8.0
+trytond_stock==2.8.0
+
+## Modulos AR de thymbra (No estan en pypi)
+#account_ar
+#account_bank_ar
+#account_check_ar
+#account_voucher_ar
+#country_ar

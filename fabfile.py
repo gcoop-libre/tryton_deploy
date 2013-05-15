@@ -64,6 +64,17 @@ def install_python_dependences():
 
         sudo('pip install -r %s --log=%s/pip.log' % (reqs, env.directory))
 
+def install_tryton_modules():
+    """Install tryton modules using pip"""
+    reqs = 'modules.txt'
+    put(reqs, env.directory)
+    put('tryton_bootstrap.py', env.directory)
+    with virtualenv():
+        sudo('pip install -r %s --log=%s/pip.log' % (reqs, env.directory))
+         #Bootstrapping!
+        sudo('python tryton_bootstrap.py')
+
+
 
 def start_postgres():
     """Start DB"""
@@ -113,7 +124,7 @@ def deploy():
     install_python_dependences()
     start_postgres()
     create_postgres_user()
-    disable_ipv6()
+    install_tryton_modules()
     start_tryton()
 
 
@@ -121,6 +132,7 @@ def update():
     """Update system and python packages"""
     install_system_dependences()
     install_python_dependences()
+    install_tryton_modules()
 
 
 def start():
