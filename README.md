@@ -11,22 +11,31 @@ deberan ser instaladas manualmente.
 Servidor objetivo Ubuntu Server 12.04.2 LTS 
 Fabric instalado en la maquina que ejecuta el Script
 
-## Instalar dependencias
+Para ejecutar un deploy:
 
-Las dependencias de paquete son las siguientes:
-    
-    python-distribute
-    postgresql
+    fab deploy
+
 
 ## Detalles
 
 En el momento del deploy se crea un nuevo usuario llamado "tryton",
 en su directorio home se encuentran dos directorios:
     
-    virtualenv
-    runtime
+    virtualenv/
+        ....
+    runtime/
+        launcher.py
+        log.py
+        pid
+        trytond.conf
 
-que contienen los componentes de la aplicacion
+El script `launcher.py` se encarga de iniciar trytond dentro del virtualenv
 
+## TODO
 
+ * Creación de una base de datos
+ * Instalación de los modulos necesarios
+ * Esquema de desarrollo, para poder probar los modulos "en vivo"
 
+## IDEAS
+ * Crear un directorio "modules" que esté linkeado al directorio modules, donde ponemos nuestros modulos custom
