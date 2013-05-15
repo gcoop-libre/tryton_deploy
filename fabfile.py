@@ -79,6 +79,7 @@ def create_postgres_user():
 def start_tryton():
     """Start tryton server in a detached enviroment"""
     put('launcher.py', env.directory)
+    put('trytond.conf', env.directory)
     with cd(env.directory), settings(sudo_user=env.user):
         sudo('dtach -n /tmp/trytond python launcher.py')
 
@@ -87,6 +88,20 @@ def stop_tryton():
     """Stop tryton daemon"""
     pidfile = "%s/pid" % env.directory
     run("kill  $(cat %s)" % pidfile)
+
+
+def disable_ipv6():
+    """Disable ipv6 on target host"""
+    params = [
+        "net.ipv6.conf.all.disable_ipv6 = 1",
+        "net.ipv6.conf.default.disable_ipv6 = 1",
+        "net.ipv6.conf.lo.disable_ipv6 = 1",
+        ]
+
+    for line in params:
+        run("echo %s >> /etc/sysctl.conf" % line)
+
+    run("sysctl -p")
 
 
 def deploy():
@@ -98,6 +113,7 @@ def deploy():
     install_python_dependences()
     start_postgres()
     create_postgres_user()
+    disable_ipv6()
     start_tryton()
 
 

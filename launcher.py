@@ -10,7 +10,7 @@ import trytond
 options = {
     'init': {},
     'update': {},
-    'configfile': None,
+    'configfile': '/home/tryton/runtime/trytond.conf',
     'db_name': [],
     'logfile': '/home/tryton/runtime/tryton.log',
     'pidfile': '/home/tryton/runtime/pid'
