@@ -82,15 +82,18 @@ def install_python_dependences():
         sudo('pip install -r %s --log=%s/pip.log' % (reqs, env.directory))
 
 
+def bootstrap():
+    put(env.bootstrap_script, env.directory)
+    with virtualenv():
+        sudo('python %s' % env.bootstrap_script)
+
+
 def install_tryton_modules():
     """Install tryton modules using pip"""
     reqs = env.modules
     put(reqs, env.directory)
     with virtualenv():
         sudo('pip install -r %s --log=%s/pip.log' % (reqs, env.directory))
-
-        #Bootstrapping!
-        sudo('python %s' % env.bootstrap_script)
 
 
 def install_develop_modules():
@@ -171,7 +174,9 @@ def deploy():
     create_postgres_user()
     install_tryton_modules()
     install_develop_modules()
+    bootstrap()
     start_tryton()
+
 
 
 def update():
@@ -180,6 +185,7 @@ def update():
     install_python_dependences()
     install_tryton_modules()
     install_develop_modules()
+    bootstrap()
 
 
 def start():
