@@ -1,6 +1,13 @@
 #! -*- coding: utf8 -*-
+"""
+Deployment script for tryton on ubuntu 12.04 LTS
+Theoretically it can work on any apt-get based GNU/Linux distro
+"""
 
 from __future__ import with_statement
+
+import os
+
 from fabric.api import run, cd, prefix, env, put, sudo, settings
 #from fabric.contrib.console import confirm
 from contextlib import contextmanager as _contextmanager
@@ -10,6 +17,11 @@ env.hosts = ["root@192.168.10.139"]
 env.directory = "/home/tryton/runtime"
 env.virtualenv_directory = "/home/tryton/virtualenv"
 env.app_user = "tryton"
+env.dev_file = "develop.txt"
+env.bootstrap_script = "tryton_bootstrap.py"
+env.requirements = "requirements.txt"
+env.modules = "modules.txt"
+env.develop_dir = "/home/tryton/develop"
 
 system_dependences = [
         'python-setuptools',
@@ -20,7 +32,9 @@ system_dependences = [
         'python-dev',
         'libxml2-dev',
         'libxslt1-dev',
-        'dtach',
+        'dtach',  #FIXME borrar cuando se demonize el proceso,
+        'mercurial',
+        'git-core',
         ]
 
 
@@ -41,8 +55,10 @@ def create_tryton_user():
 def create_app_dirs():
     """Create app dirs"""
     with settings(sudo_user=env.app_user):
-        sudo('mkdir %s' % env.directory)
-        sudo('mkdir %s' % env.virtualenv_directory)
+        #FIXME usar una lista y un for
+        sudo('mkdir -p %s' % env.directory)
+        sudo('mkdir -p %s' % env.virtualenv_directory)
+        sudo('mkdir -p %s' % env.develop_dir)
 
 
 def create_virtualenv():
@@ -58,23 +74,37 @@ def install_system_dependences():
 
 def install_python_dependences():
     """Install all python dependences using pip"""
-    reqs = 'requirements.txt'
+    reqs = env.requirements
     put(reqs, env.directory)
     with virtualenv():
-
         sudo('pip install -r %s --log=%s/pip.log' % (reqs, env.directory))
+
 
 def install_tryton_modules():
     """Install tryton modules using pip"""
-    reqs = 'modules.txt'
+    reqs = env.modules
     put(reqs, env.directory)
-    put('tryton_bootstrap.py', env.directory)
     with virtualenv():
         sudo('pip install -r %s --log=%s/pip.log' % (reqs, env.directory))
-         #Bootstrapping!
-        sudo('python tryton_bootstrap.py')
+
+        #Bootstrapping!
+        sudo('python %s' % env.bootstrap_script)
 
 
+def install_develop_modules():
+    """Install git and hg modules in trytond"""
+    if os.path.isfile(env.dev_file):
+        put(env.dev_file, env.directory)
+        with virtualenv(), open(env.dev_file, 'r') as fh:
+            for line in fh.readlines():
+                line = line.replace('\n', '')
+                if line.startswith('git') or line.startswith('hg'):
+                    with cd(env.develop_dir):
+                        sudo(line)
+                        dir_name = line.split('/')[-1].split('.')[0]
+                        #ingresar al directorio y ejecutar "python setup.py"
+                        with cd(dir_name):
+                            sudo('python setup.py')
 
 def start_postgres():
     """Start DB"""
@@ -125,6 +155,7 @@ def deploy():
     start_postgres()
     create_postgres_user()
     install_tryton_modules()
+    install_develop_modules()
     start_tryton()
 
 
@@ -133,6 +164,7 @@ def update():
     install_system_dependences()
     install_python_dependences()
     install_tryton_modules()
+    install_develop_modules()
 
 
 def start():
