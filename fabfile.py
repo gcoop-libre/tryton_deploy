@@ -9,6 +9,8 @@ from __future__ import with_statement
 import os
 
 from fabric.api import run, cd, prefix, env, put, sudo, settings
+from fabric.contrib.files import exists
+
 #from fabric.contrib.console import confirm
 from contextlib import contextmanager as _contextmanager
 
@@ -93,16 +95,29 @@ def install_tryton_modules():
 
 def install_develop_modules():
     """Install git and hg modules in trytond"""
+    PULL_DICT = {'git':'git pull', 'hg':'hg pull -u'}
+
     if os.path.isfile(env.dev_file):
         put(env.dev_file, env.directory)
         with virtualenv(), open(env.dev_file, 'r') as fh:
             for line in fh.readlines():
                 line = line.replace('\n', '')
-                if line.startswith('git') or line.startswith('hg'):
+                command = None
+
+                if line.startswith('git'):
+                    command = 'git'
+                elif line.startswith('hg'):
+                    command = 'hg'
+
+                if command:
                     with cd(env.develop_dir):
-                        sudo(line)
                         dir_name = line.split('/')[-1].split('.')[0]
-                        #ingresar al directorio y ejecutar "python setup.py"
+                        if exists(dir_name):
+                            with cd(dir_name):
+                                sudo(PULL_DICT[command])
+                        else:
+                            sudo(line)
+
                         with cd(dir_name):
                             sudo('python setup.py')
 
