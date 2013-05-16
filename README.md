@@ -19,7 +19,7 @@ Para ejecutar un deploy:
 ## Detalles
 
 En el momento del deploy se crea un nuevo usuario llamado "tryton",
-en su directorio home se encuentran dos directorios:
+en su directorio home se encuentran tres directorios:
     
     virtualenv/
         ....
@@ -28,8 +28,22 @@ en su directorio home se encuentran dos directorios:
         log.py
         pid
         trytond.conf
+    develop/
+        ......
 
 El script `launcher.py` se encarga de iniciar trytond dentro del virtualenv
+
+## Modulos en desarrollo 
+
+Para permitir trabajar con módulos que no se encuentran en PyPI,
+el script contempla la utilización de repositorios git y mercurial,
+consignando en el archivo develop lineas de la forma:
+
+    git clone git://github.com/gcoop-libre/tryton_factura_electronica.git
+    hg clone https://bitbucket.org/thymbra/account_ar
+
+Para cada linea, el script de deployment ejecutara el comando e 
+instalará y activara dicho módulo en la instancia de trytond
 
 ## TODO
 
