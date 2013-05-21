@@ -47,10 +47,7 @@ instalará y activara dicho módulo en la instancia de trytond
 
 ## TODO
 
- * Activacion de modulos necesarios
+ * Demonizar trytond
  * Esquema de desarrollo, para poder probar los modulos "en vivo"
  * Migrar paquetes de tymbra
  * Instalar paquetes de tymbra que no estan en pypi
-
-## IDEAS
- * Crear un directorio "modules" que esté linkeado al directorio modules, donde ponemos nuestros modulos custom
