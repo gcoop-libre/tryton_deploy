@@ -1,0 +1,3 @@
+#Lista de modulos para desarrollo
+hg clone https://bitbucket.org/joac/account_ar
+hg clone http://hg.openhex.org/relatorio
