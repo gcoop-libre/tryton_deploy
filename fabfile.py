@@ -14,7 +14,7 @@ from fabric.contrib.files import exists
 #from fabric.contrib.console import confirm
 from contextlib import contextmanager as _contextmanager
 
-env.hosts = ["root@192.168.10.139"]
+env.hosts = ["root@fontar"]
 
 env.directory = "/home/tryton/runtime"
 env.virtualenv_directory = "/home/tryton/virtualenv"
@@ -83,7 +83,9 @@ def install_python_dependences():
 
 
 def bootstrap():
+    """Creates a new tryton db, and activate all installed modules"""
     put(env.bootstrap_script, env.directory)
+    put('trytond.conf', env.directory)
     with virtualenv():
         sudo('python %s' % env.bootstrap_script)
 
@@ -122,7 +124,7 @@ def install_develop_modules():
                             sudo(line)
 
                         with cd(dir_name):
-                            sudo('python setup.py')
+                            sudo('python setup.py install')
 
 def start_postgres():
     """Start DB"""

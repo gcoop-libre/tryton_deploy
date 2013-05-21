@@ -19,7 +19,7 @@ password = getpass.getpass(
 config = config.set_trytond(
                             db_name,
                             'admin',
-                            'postresql',
+                            'postgresql',
                             LANGUAGE,
                             password,
                             CONFIG_FILE
@@ -28,7 +28,6 @@ config = config.set_trytond(
 #Obtengo todos los modulos instalados!
 
 Module = Model.get('ir.module.module')
-modules = Module.find()  # Obtengo todos
+modules = Module.find([('name', '=', 'party')])  # Obtengo todos
 Module.install([m.id for m in modules], config.context)
-
 Wizard('ir.module.module.install_upgrade').execute('upgrade')
