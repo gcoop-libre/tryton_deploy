@@ -2,10 +2,7 @@
 
 """install tryton in a custom instance tryton modules"""
 
-#Tryton throw a lot of deprecation warnings, we turn these off
 import warnings
-with warnings.catch_warnings():
-    warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 import getpass
 from proteus import config, Model, Wizard
@@ -21,7 +18,7 @@ password = getpass.getpass(
     "Ingrese el password de admin a utilizar en la base '%s': " % db_name
     )
 
-#Si la base de datos no existe, proteus la crea :)
+#if database doesn't exists, proteus creates it
 config = config.set_trytond(
                             db_name,
                             'admin',
@@ -31,9 +28,12 @@ config = config.set_trytond(
                             CONFIG_FILE
                             )
 
-#Obtengo todos los modulos instalados!
+#Tryton throw a lot of deprecation warnings, we turn these off
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore', category=DeprecationWarning)
 
-Module = Model.get('ir.module.module')
-modules = Module.find()  # Obtengo todos
-Module.install([m.id for m in modules], config.context)
-Wizard('ir.module.module.install_upgrade').execute('upgrade')
+    Module = Model.get('ir.module.module')
+    #Get all installed modules
+    modules = Module.find()
+    Module.install([m.id for m in modules], config.context)
+    Wizard('ir.module.module.install_upgrade').execute('upgrade')
