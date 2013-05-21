@@ -1,6 +1,12 @@
 #! -*- coding: utf8 -*-
 
 """install tryton in a custom instance tryton modules"""
+
+#Tryton throw a lot of deprecation warnings, we turn these off
+import warnings
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore', category=DeprecationWarning)
+
 import getpass
 from proteus import config, Model, Wizard
 
@@ -28,6 +34,6 @@ config = config.set_trytond(
 #Obtengo todos los modulos instalados!
 
 Module = Model.get('ir.module.module')
-modules = Module.find([('name', '=', 'party')])  # Obtengo todos
+modules = Module.find()  # Obtengo todos
 Module.install([m.id for m in modules], config.context)
 Wizard('ir.module.module.install_upgrade').execute('upgrade')
