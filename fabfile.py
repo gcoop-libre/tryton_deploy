@@ -45,11 +45,10 @@ system_dependences = [
         'python-dev',
         'libxml2-dev',
         'libxslt1-dev',
-        'dtach',  #FIXME borrar cuando se demonize el proceso,
+        'dtach',  # FIXME borrar cuando se demonize el proceso,
         'mercurial',
         'git-core',
         ]
-
 
 
 @_contextmanager
@@ -112,7 +111,7 @@ def install_tryton_modules():
 
 def install_develop_modules():
     """Install git and hg modules in trytond"""
-    PULL_DICT = {'git':'git pull', 'hg':'hg pull -u'}
+    PULL_DICT = {'git': 'git pull', 'hg': 'hg pull -u'}
 
     if os.path.isfile(env.dev_file):
         put(env.dev_file, env.directory)
@@ -138,6 +137,7 @@ def install_develop_modules():
                         with cd(dir_name):
                             sudo('python setup.py install')
 
+
 def copy_module(module_path=None):
     """Copy a module inside trytond modules dir"""
     if not module_path:
@@ -148,7 +148,6 @@ def copy_module(module_path=None):
     put(module_path, env.modules_directory)
     with cd(env.modules_directory):
         sudo("chown tryton.tryton -R %s" % os.path.basename(module_path))
-
 
 
 def start_postgres():
@@ -168,8 +167,6 @@ def start_tryton():
     put('trytond.conf', env.directory)
     with cd(env.directory), settings(sudo_user=env.user):
         sudo('dtach -n /tmp/trytond python launcher.py')
-
-
 
 
 def stop_tryton():
