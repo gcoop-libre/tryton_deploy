@@ -8,16 +8,27 @@ from __future__ import with_statement
 
 import os
 
-from fabric.api import run, cd, prefix, env, put, sudo, settings
+from fabric.api import (
+        abort,
+        cd,
+        env,
+        prefix,
+        put,
+        run,
+        settings,
+        sudo,
+    )
 from fabric.contrib.files import exists
 
 #from fabric.contrib.console import confirm
 from contextlib import contextmanager as _contextmanager
 
+# Change this for your target HOSTS
 env.hosts = ["root@fontar"]
 
 env.directory = "/home/tryton/runtime"
 env.virtualenv_directory = "/home/tryton/virtualenv"
+env.modules_directory = "/home/tryton/virtualenv/lib/python2.7/site-packages/trytond/modules"
 env.app_user = "tryton"
 env.dev_file = "develop.txt"
 env.bootstrap_script = "tryton_bootstrap.py"
@@ -38,6 +49,7 @@ system_dependences = [
         'mercurial',
         'git-core',
         ]
+
 
 
 @_contextmanager
@@ -126,6 +138,19 @@ def install_develop_modules():
                         with cd(dir_name):
                             sudo('python setup.py install')
 
+def copy_module(module_path=None):
+    """Copy a module inside trytond modules dir"""
+    if not module_path:
+        abort("You have to give a module path to upload")
+    if module_path.endswith('/'):
+        module_path = os.path.dirname(module_path)
+
+    put(module_path, env.modules_directory)
+    with cd(env.modules_directory):
+        sudo("chown tryton.tryton -R %s" % os.path.basename(module_path))
+
+
+
 def start_postgres():
     """Start DB"""
     run("/etc/init.d/postgresql start")
@@ -143,6 +168,8 @@ def start_tryton():
     put('trytond.conf', env.directory)
     with cd(env.directory), settings(sudo_user=env.user):
         sudo('dtach -n /tmp/trytond python launcher.py')
+
+
 
 
 def stop_tryton():
@@ -178,7 +205,6 @@ def deploy():
     install_develop_modules()
     bootstrap()
     start_tryton()
-
 
 
 def update():
