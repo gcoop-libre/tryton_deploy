@@ -24,7 +24,7 @@ from fabric.contrib.files import exists
 from contextlib import contextmanager as _contextmanager
 
 # Change this for your target HOSTS
-env.hosts = ["root@fontar"]
+#env.hosts = ["root@fontar2"]
 
 env.directory = "/home/tryton/runtime"
 env.virtualenv_directory = "/home/tryton/virtualenv"
