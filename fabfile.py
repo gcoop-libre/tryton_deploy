@@ -165,6 +165,7 @@ def start_tryton():
     """Start tryton server in a detached enviroment"""
     put('launcher.py', env.directory)
     put('trytond.conf', env.directory)
+    put('tryton_start.sh', env.directory)
     with cd(env.directory), settings(sudo_user=env.user):
         sudo('dtach -n /tmp/trytond python launcher.py')
 
