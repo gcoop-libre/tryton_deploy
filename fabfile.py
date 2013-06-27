@@ -7,6 +7,7 @@ Theoretically it can work on any apt-get based GNU/Linux distro
 from __future__ import with_statement
 
 import os
+import time
 
 from fabric.api import (
         abort,
@@ -223,3 +224,28 @@ def start():
 def stop():
     """Stop Execution"""
     stop_tryton()
+
+def restart():
+    stop()
+    time.sleep(1)
+    start()
+
+def drop_all():
+    """Drop all databases in the instance"""
+    stop()
+    put('drop_all.py', env.directory)
+    put('trytond.conf', env.directory)
+    with cd(env.directory), settings(sudo_user=env.user):
+        sudo('python drop_all.py')
+    start()
+
+
+def update_all():
+    """Update all databases in the instance"""
+    stop()
+    put('updater.py', env.directory)
+    put('trytond.conf', env.directory)
+    with cd(env.directory), settings(sudo_user=env.user):
+        sudo('python updater.py')
+
+
