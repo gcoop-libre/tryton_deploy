@@ -18,6 +18,7 @@ from fabric.api import (
         run,
         settings,
         sudo,
+        task,
     )
 from fabric.contrib.files import exists
 
@@ -80,12 +81,14 @@ def create_virtualenv():
         sudo("virtualenv %s" % env.virtualenv_directory)
 
 
+@task
 def install_system_dependences():
     """Install apt-get based dependences"""
     run('apt-get -q update')
     run('apt-get -q install %s' % ' '.join(system_dependences))
 
 
+@task
 def install_python_dependences():
     """Install all python dependences using pip"""
     reqs = env.requirements
@@ -94,6 +97,7 @@ def install_python_dependences():
         sudo('pip install -r %s --log=%s/pip.log' % (reqs, env.directory))
 
 
+@task
 def bootstrap():
     """Creates a new tryton db, and activate all installed modules"""
     put(env.bootstrap_script, env.directory)
@@ -102,6 +106,7 @@ def bootstrap():
         sudo('python %s' % env.bootstrap_script)
 
 
+@task
 def install_tryton_modules():
     """Install tryton modules using pip"""
     reqs = env.modules
@@ -110,6 +115,7 @@ def install_tryton_modules():
         sudo('pip install -r %s --log=%s/pip.log' % (reqs, env.directory))
 
 
+@task
 def install_develop_modules():
     """Install git and hg modules in trytond"""
     PULL_DICT = {'git': 'git pull', 'hg': 'hg pull -u'}
@@ -139,6 +145,7 @@ def install_develop_modules():
                             sudo('python setup.py install')
 
 
+@task
 def copy_module(module_path=None):
     """Copy a module inside trytond modules dir"""
     if not module_path:
@@ -191,6 +198,7 @@ def disable_ipv6():
     run("sysctl -p")
 
 
+@task
 def deploy():
     """Run a complete deploy on a target server"""
     install_system_dependences()
@@ -206,6 +214,7 @@ def deploy():
     start_tryton()
 
 
+@task
 def update():
     """Update system and python packages"""
     install_system_dependences()
@@ -215,21 +224,28 @@ def update():
     bootstrap()
 
 
+@task
 def start():
     """Start an installed instance of trytond"""
     start_postgres()
     start_tryton()
 
 
+@task
 def stop():
     """Stop Execution"""
     stop_tryton()
 
+
+@task
 def restart():
+    """Restart the instance"""
     stop()
     time.sleep(1)
     start()
 
+
+@task
 def drop_all():
     """Drop all databases in the instance"""
     stop()
@@ -240,12 +256,11 @@ def drop_all():
     start()
 
 
-def update_all():
+@task
+def update_all_modules():
     """Update all databases in the instance"""
     stop()
     put('updater.py', env.directory)
     put('trytond.conf', env.directory)
     with cd(env.directory), settings(sudo_user=env.user):
         sudo('python updater.py')
-
-
